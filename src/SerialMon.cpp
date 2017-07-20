@@ -239,8 +239,8 @@ int main() {
 
 
 
-	Vpar ioPO;
-	Vpar ioHD;
+	Vpar *ioPO;
+	Vpar *ioHD;
 
 	pthread_t		inPOwrHD;				// читает ПО передает в оборудование
 
@@ -275,27 +275,28 @@ int main() {
 
 	ofstream outfile ("./InputOutputSer.txt",ios::app);
 
+	ioPO = new Vpar;
+	ioHD = new Vpar;
 
 
+	ioPO->ident = string("InPr");					// поток читает данные от програмного обеспечения и передает в оборудование
+	ioPO->of = &outfile;
+	ioPO->serIn = serIOPO;
+	ioPO->serOut = serIOHD;
 
-	ioPO.ident = string("InPr");					// поток читает данные от програмного обеспечения и передает в оборудование
-	ioPO.of = &outfile;
-	ioPO.serIn = serIOPO;
-	ioPO.serOut = serIOHD;
-
-	ioHD.ident = string("InHD");					// поток читает данные от оборудование и передает програмному обеспечению
-	ioHD.of = &outfile;
-	ioHD.serIn = serIOHD;
-	ioHD.serOut = serIOPO;
+	ioHD->ident = string("InHD");					// поток читает данные от оборудование и передает програмному обеспечению
+	ioHD->of = &outfile;
+	ioHD->serIn = serIOHD;
+	ioHD->serOut = serIOPO;
 
 
 	// создать потоки
 
-	if (pthread_create(&inPOwrHD, NULL,InOut, &ioHD) != 0){
+	if (pthread_create(&inPOwrHD, NULL,InOut, ioHD) != 0){
 		FlEnd = 0;
 	}
 
-	if (pthread_create(&inHDwrPO, NULL,InOut, &ioPO ) != 0){
+	if (pthread_create(&inHDwrPO, NULL,InOut, ioPO ) != 0){
 			FlEnd = 0;
 	}
 
@@ -317,6 +318,9 @@ int main() {
 	pthread_join(inHDwrPO,NULL);
 	delete serIOPO;
 	delete serIOHD;
+
+	delete ioPO;
+	delete ioHD;
 
 	outfile.close();
 
