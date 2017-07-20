@@ -168,7 +168,7 @@ void* InOut(void* In){
 	vp = (Vpar*)In;
 
 	try {
-		bfret = new unsigned char[2028];
+		bfret = new unsigned char[SERIALIO_MAX_LEN_DATA];
 	} catch (bad_alloc &e){
 		FlEnd = 0;
 		cout << "Bad allovate memeory of InOutPO  "  << endl;
@@ -187,10 +187,10 @@ void* InOut(void* In){
 			if (FlEnd == 0)
 				continue;
 
-			bzero ((char*)bfret, 2048);
+			bzero ((char*)bfret, SERIALIO_MAX_LEN_DATA);
 
 
-			retlen = vp->serIn->GetB(bfret, 2048);					// прочитать данные с последовательного устройства
+			retlen = vp->serIn->GetB(bfret, SERIALIO_MAX_LEN_DATA);					// прочитать данные с последовательного устройства
 
 
 		} catch (ErTODO &er_todo) {
@@ -264,7 +264,7 @@ int main() {
 
 	try {
 
-		serIOHD = new SerialIO("/dev/ttyUSB1","19200 8N1 CLOCAL", ".");
+		serIOHD = new SerialIO("/dev/ttyUSB1","9600 8N1 CLOCAL", ".");
 	} catch (ErTODO &e) {
 		printErSerial(&e);
 

@@ -45,7 +45,7 @@ namespace sega {
 
 #define SERIALIO_MAX_LEN_DV	128				// максимальная длинна строки
 #define SERIALIO_MAX_LEN_PAR	32			// максимальная длиннас троки с параметрами
-#define SERIALIO_MAX_LEN_DATA	1024		// максимальный размер буфера данных принимаемого за один раз
+#define SERIALIO_MAX_LEN_DATA	2048		// максимальный размер буфера данных принимаемого за один раз
 
 
 #define SERIAL_NPOS -1						// переменная для манипуляции строками ( позиция не определена
