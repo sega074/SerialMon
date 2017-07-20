@@ -252,7 +252,7 @@ int main() {
 
 	try {
 
-		serIOPO = new SerialIO("/dev/ttyUSB0","19200 8N1 CLOCAL", ".");
+		serIOPO = new SerialIO("/dev/ttyUSB0","9600 8N1 CLOCAL", ".");
 	} catch (ErTODO &e) {
 		printErSerial(&e);
 
