@@ -9,7 +9,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>								// для работы со строкой при прием парамеров утилиты
-#include <unistd.h>								// для getopt
+//#include <stdlib.h>
+//#include <unistd.h>								// для getopt
+//#define _GNU_SOURCE
 #include <getopt.h>								// для getopt
 #include <time.h>
 #include <sys/time.h>
@@ -233,6 +235,12 @@ void* InOut(void* In){
 
 
 
+
+extern char *optarg;
+extern int optind, opterr, optopt;
+
+
+
 int main(int argc, char **argv) {
 
 	static struct option long_options[] = {		// Параметры управления
@@ -265,7 +273,7 @@ int main(int argc, char **argv) {
 	// прочитать параметры з командной строки
 
     while (1) {
-        int this_option_optind = optind ? optind : 1;
+
         int option_index = 0;
         int c;
 
@@ -275,32 +283,39 @@ int main(int argc, char **argv) {
             break;
 
         switch (c) {
+
         case 1:
         case 'S':
-            printf ("параметр %s", long_options[option_index].name);
-            if (optarg)
-                printf (" с аргументом %s", optarg);
-            printf ("\n");
+        	cout << optarg << endl;
+        	SDrvSf = string(optarg);
             break;
 
         case 2:
         case 'H':
+        	cout << optarg << endl;
+        	SDrvHD = string(optarg);
         	break;
 
         case 3:
         case 'P':
+        	cout << optarg << endl;
+        	SParamDRV = string (optarg);
 			break;
 
         case 4:
         case 'D':
+        	cout << optarg << endl;
+        	SDirLock = string(optarg);
             break;
 
         case 5:
         case 'L':
-            printf ("параметр a\n");
+        	cout << optarg << endl;
+        	SFileLog = string(optarg);
             break;
 
         case '?':
+        	cout << optarg << endl;
             break;
 
         default:
