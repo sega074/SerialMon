@@ -8,6 +8,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>								// для работы со строкой при прием парамеров утилиты
+#include <unistd.h>								// для getopt
+#include <getopt.h>								// для getopt
 #include <time.h>
 #include <sys/time.h>
 #include <pthread.h>
@@ -230,14 +233,26 @@ void* InOut(void* In){
 
 
 
-int main() {
+int main(int argc, char **argv) {
 
+	static struct option long_options[] = {		// Параметры управления
+	            {"SoftDrv", 1, 0, 1},
+	            {"HardDrv", 1, 0, 2},
+	            {"ParamSer", 1, 0, 3},
+	            {"DirLock", 1, 0, 4},
+				{"LogFile", 1, 0, 5},
+	            {0, 0, 0, 0}
+	        };
 
-	SerialIO	*serIOPO;
+	string SDrvSf = string("/dev/ttyUSB0");			// имя драйвера устройсттва со стороны ПО
+	string SDrvHD = string("/dev/ttyUSB1");			// имя драйвера устройства со стороны оборудования
+	string SParamDRV = string ("9600 8N1 CLOCAL");	// строка конфигурации последовательного устройства
+	string SDirLock = string(".");					// директорий в котором будут храниться файлы блокировок портов
+	string SFileLog = string("SerialIOLog");		// файл логирования трафика обмена
 
-	SerialIO	*serIOHD;
+	SerialIO	*serIOPO;				// сериал порт со стороны ПО
 
-
+	SerialIO	*serIOHD;				// сериал порт со стороны оборудования
 
 	Vpar *ioPO;
 	Vpar *ioHD;
@@ -247,24 +262,74 @@ int main() {
 	pthread_t		inHDwrPO;				// читает данные из оборудования передает в ПО
 
 
+	// прочитать параметры з командной строки
+
+    while (1) {
+        int this_option_optind = optind ? optind : 1;
+        int option_index = 0;
+        int c;
+
+
+        c = getopt_long (argc, argv, "D:H:L:P:S:", long_options, &option_index);
+        if (c == -1)
+            break;
+
+        switch (c) {
+        case 1:
+        case 'S':
+            printf ("параметр %s", long_options[option_index].name);
+            if (optarg)
+                printf (" с аргументом %s", optarg);
+            printf ("\n");
+            break;
+
+        case 2:
+        case 'H':
+        	break;
+
+        case 3:
+        case 'P':
+			break;
+
+        case 4:
+        case 'D':
+            break;
+
+        case 5:
+        case 'L':
+            printf ("параметр a\n");
+            break;
+
+        case '?':
+            break;
+
+        default:
+            printf ("?? getopt возвратило код символа 0%o ??\n", c);
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 
 	try {
 
-		serIOPO = new SerialIO("/dev/ttyUSB0","9600 8N1 CLOCAL", ".");
+		serIOPO = new SerialIO(SDrvSf.c_str(),SParamDRV.c_str(),  SDirLock.c_str());
 	} catch (ErTODO &e) {
 		printErSerial(&e);
-
-
 		throw ErTODO(e);
-
 	}
 
 
 	try {
 
-		serIOHD = new SerialIO("/dev/ttyUSB1","9600 8N1 CLOCAL", ".");
+		serIOHD = new SerialIO(SDrvHD.c_str(),SParamDRV.c_str(), SDirLock.c_str());
 	} catch (ErTODO &e) {
 		printErSerial(&e);
 
@@ -273,7 +338,7 @@ int main() {
 
 	}
 
-	ofstream outfile ("./InputOutputSer.txt",ios::app);
+	ofstream outfile (SFileLog.c_str(),ios::app);
 
 	ioPO = new Vpar;
 	ioHD = new Vpar;
