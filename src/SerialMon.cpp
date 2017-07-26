@@ -212,16 +212,24 @@ void* InOut(void* In){
 		try {
 
 
-			do{		// ждать готовности последовтального устройства для передачи
-
-			}while(!(vp->serOut->SSelectPut(500000) == SERIAL_IO_SEL_WRITE) && (FlEnd == 1));
-
-			if (FlEnd == 0)
-				continue;
 
 
-			for (int w = 0; w < retlen; w+=ret, retlen -= w){
+
+
+
+			for (int w = 0; w < retlen; ){
+
+				do{		// ждать готовности последовтального устройства для передачи
+
+				}while(!(vp->serOut->SSelectPut(500000) == SERIAL_IO_SEL_WRITE) && (FlEnd == 1));
+
+				if (FlEnd == 0)	break;											// получена команда  на завершение
+
 				ret = vp->serOut->PutB(bfret + w, retlen  );					// передать данные в выходное последовательное устройство
+
+				w+=ret;															// передвинуть указатель
+
+				retlen -= w;													// изменить число байт для записи
 			}
 
 
