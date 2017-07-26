@@ -133,12 +133,12 @@ void outdate(ofstream *os, string first, unsigned char *bf, int len){
 	ctime_r(&(tmvl.tv_sec),tmpbf);
 	if (memchr(tmpbf,'\n',32) != NULL)  *((char*)(memchr(tmpbf,'\n',32))) = 0 ;
 
-	(*os) << tmpbf << " " << tmvl.tv_usec  << " ";
+	(*os) << tmpbf << " " << dec << tmvl.tv_usec  << " ";
 
 
 	for (int i = 0 ; i < len ; i ++){
 
-		(*os) << "(" << (unsigned int ) bf[i] << ")";
+		(*os) << "(" << "0x"<<hex << (unsigned int ) bf[i] << ")";
 		if (bf[i] >= NO_PRINT_SIMBOOL){
 			(*os) << bf[i];
 		}
@@ -194,6 +194,7 @@ void* InOut(void* In){
 
 			bzero ((char*)bfret, SERIALIO_MAX_LEN_DATA);
 
+			sleep(1);
 
 			retlen = vp->serIn->GetB(bfret, SERIALIO_MAX_LEN_DATA);					// прочитать данные с последовательного устройства
 
@@ -206,7 +207,7 @@ void* InOut(void* In){
 		}
 
 
-		outdate (vp->of, vp->ident, bfret, retlen);// сохранить данные в файл
+		outdate (vp->of, string("Get from ") + vp->ident, bfret, retlen);// сохранить данные в файл
 
 
 		try {
@@ -367,12 +368,12 @@ int main(int argc, char **argv) {
 	ioHD = new Vpar;
 
 
-	ioPO->ident = string("InPr");					// поток читает данные от програмного обеспечения и передает в оборудование
+	ioPO->ident = SDrvSf;					// поток читает данные от програмного обеспечения и передает в оборудование
 	ioPO->of = &outfile;
 	ioPO->serIn = serIOPO;
 	ioPO->serOut = serIOHD;
 
-	ioHD->ident = string("InHD");					// поток читает данные от оборудование и передает програмному обеспечению
+	ioHD->ident = SDrvHD;					// поток читает данные от оборудование и передает програмному обеспечению
 	ioHD->of = &outfile;
 	ioHD->serIn = serIOHD;
 	ioHD->serOut = serIOPO;
